@@ -1,127 +1,157 @@
 <script lang="ts">
-    let id: string = '';
-    let result: string = '';
-  
-    async function checkID() {
-      const response = await fetch('http://localhost:3000/check-id', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id })
-      });
-  
-      if (response.ok) {
-        const data = await response.json();
-        if (data.result !== null) {
-          result = `ID found., COLOR OF MILK : ${data.color} color Calculated result: ${data.result} `;
-        } 
-      } else {
-        const data = await response.json();
-        result = `${data.error}`;
-      }
-    }
-  </script>
-  
+  let ids: string[] = [''];
+  let results: string[] = [];
 
-  
-  <div class="container">
-    <form on:submit|preventDefault={checkID}>
-      <div class="form-group">
-        <label for="id">Welcome to COW Strike </label>
-        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 64 64" {...$$props}>
-          <path fill="#f59221" d="M57.996 2.673c-1.439-3.908-6.02 2.976-9 6.78c-2.981 3.813-5.688 7.146-2.406 9.713c3.289 2.57 4.299 13.836 7.273 10.03c2.978-3.806 5.744-22.15 4.134-26.523m-51.708 0c1.439-3.908 6.02 2.976 8.999 6.78c2.983 3.813 5.686 7.146 2.405 9.713c-3.287 2.57-4.297 13.836-7.273 10.03C7.442 25.39 4.678 7.046 6.289 2.673" />
-          <path fill="#aeaeae" d="M60.27 12.891c2.91 2.275 2.742 8.207.721 10.793s-8.147 7.702-11.06 5.427c-2.907-2.273-5.763-3.663-3.743-6.25c2.026-2.587 11.175-12.245 14.08-9.97m-56.248 0c-2.912 2.275-2.743 8.207-.72 10.793c2.02 2.586 8.146 7.702 11.06 5.427c2.907-2.273 5.762-3.663 3.741-6.25s-11.173-12.245-14.08-9.97" />
-          <g fill="#cfd0d0">
-            <path d="M7.509 39.13c0 9.941 11.1 17.991 24.798 17.991c13.699 0 24.798-8.05 24.798-17.991c0-9.933-11.1-31.556-24.798-31.556c-13.702 0-24.798 21.623-24.798 31.556" />
-            <path d="M7.894 21.46c0 4.84 10.924 8.754 24.413 8.754c13.487 0 24.413-3.916 24.413-8.754c0-4.834-10.926-13.882-24.413-13.882c-13.489.001-24.413 9.05-24.413 13.882" />
-          </g>
-          <path fill="#cfd0d0" d="M29.299 18.383c0 6.131-3.318 11.11-7.417 11.11c-4.097 0-7.425-4.978-7.425-11.11c0-6.137 3.328-11.11 7.425-11.11s7.417 4.972 7.417 11.11M42.731 7.274c4.095 0 7.425 4.971 7.425 11.11c0 6.131-3.33 11.11-7.425 11.11c-4.103 0-7.417-4.978-7.417-11.11c0-6.135 3.32-11.11 7.417-11.11" />
-          <g fill="#25333a" transform="translate(-.15)">
-            <ellipse cx="23.746" cy="22.96" rx="3.987" ry="4.834" />
-            <ellipse cx="41.17" cy="22.96" rx="3.988" ry="4.834" />
-          </g>
-          <path fill="#c4775c" d="M21.805 56.25c0-3.722 4.251-3.652 10.05-3.652c5.801 0 10.954-.067 10.954 3.652c0 3.729-4.703 6.749-10.502 6.749c-5.795-.001-10.502-3.02-10.502-6.749" />
-          <path fill="#784e3e" d="M23.01 43.46c0 2.625-1.753 4.745-3.912 4.745c-2.164 0-3.917-2.12-3.917-4.745c0-2.616 1.752-4.739 3.917-4.739c2.159 0 3.912 2.123 3.912 4.739m25.805-.03c0 2.623-1.752 4.743-3.909 4.743c-2.165 0-3.917-2.12-3.917-4.743c0-2.618 1.753-4.741 3.917-4.741c2.157-.001 3.909 2.124 3.909 4.741" />
-          <path fill="#cd8265" d="M8.06 42.34c0-8.187 9.815-8.342 23.2-8.342c13.395 0 25.287.157 25.287 8.342c0 8.199-10.858 14.658-24.25 14.658c-13.381 0-24.24-6.459-24.24-14.658" />
-          <path fill="#784e3e" d="M21.313 44.36c0 3.121-2.084 5.641-4.649 5.641c-2.572 0-4.657-2.52-4.657-5.641c0-3.111 2.085-5.635 4.657-5.635c2.565-.002 4.649 2.523 4.649 5.635m30.682 0c0 3.121-2.084 5.642-4.649 5.642c-2.573 0-4.656-2.521-4.656-5.642c0-3.111 2.084-5.635 4.656-5.635c2.565 0 4.649 2.525 4.649 5.635" />
-        </svg>
-        <label for="id">Enter COW ID:</label>
-        <input
-          id="id"
-          type="text"
-          bind:value={id}
-          placeholder="Enter ID"
-          required
-        />
+  async function checkID() {
+      results = []; 
+
+      for (const id of ids) {
+          if (id.trim()) { 
+              const response = await fetch('http://localhost:3000/api/check-id', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ id })
+              });
+
+              if (response.ok) {
+                  const data = await response.json();
+                  if (data.result !== null) {
+                      results.push(`ID: ${id}, COLOR OF MILK: ${data.color}, Calculated result: ${data.result}`);
+                  }
+              } else {
+                  const data = await response.json();
+                  results.push(`ID: ${id}, Error: ${data.error}`);
+              }
+          }
+      }
+  }
+
+  function addIDField() {
+      ids = [...ids, ''];
+  }
+
+  function handleIDChange(index: number, value: string) {
+      ids[index] = value;
+  }
+</script>
+
+<div class="container">
+  <h1>Welcome to COW Strike</h1>
+  <form on:submit|preventDefault={checkID}>
+      {#each ids as id, index}
+          <div class="form-group">
+              <label for={`id-${index}`}>Enter COW ID:</label>
+              <input
+                  id={`id-${index}`}
+                  type="text"
+                  bind:value={ids[index]}
+                  placeholder="Enter ID"
+                  required
+                  on:input={(e) => handleIDChange(index, e.target.value)}
+              />
+          </div>
+      {/each}
+      <div class="button-group">
+          <button type="button" on:click={addIDField}>+ Add ID</button>
+          <button type="submit">Check IDs</button>
       </div>
-      <button type="submit">Check ID</button>
-    </form>
-  
-    {#if result}
-      <p class="result">{result}</p>
-    {/if}
-  </div>
-  <style>
-    .container {
+  </form>
+
+  {#if results.length > 0}
+      <div class="results">
+          {#each results as result}
+              <p class="result">{result}</p>
+          {/each}
+      </div>
+  {/if}
+</div>
+
+<style>
+  .container {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
       font-family: 'Arial', sans-serif;
-      background-color: #f9f9f9;
-    }
-  
-    .form-group {
+      background-color: #f0f4f8;
+      padding: 20px;
+  }
+
+  h1 {
+      font-size: 2rem;
+      color: #333;
+      margin-bottom: 1rem;
+  }
+
+  .form-group {
       display: flex;
       flex-direction: column;
       margin-bottom: 1rem;
-      width: 300px;
-    }
-  
-    label {
+      width: 100%;
+      max-width: 400px;
+  }
+
+  label {
       font-size: 1.2rem;
       margin-bottom: 0.5rem;
       color: #555;
-    }
-  
-    input {
-      padding: 10px;
+  }
+
+  input {
+      padding: 12px;
       font-size: 1rem;
-      border: 2px solid #ccc;
-      border-radius: 5px;
-      transition: border-color 0.3s;
-    }
-  
-    input:focus {
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  input:focus {
       outline: none;
       border-color: #007bff;
-    }
-  
-    button {
-      padding: 10px 15px;
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+
+  .button-group {
+      display: flex;
+      gap: 10px;
+  }
+
+  button {
+      padding: 12px 20px;
       font-size: 1rem;
       background-color: #007bff;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.3s;
-    }
-  
-    button:hover {
+      transition: background-color 0.3s, transform 0.3s;
+  }
+
+  button:hover {
       background-color: #0056b3;
-    }
-  
-    p {
+      transform: scale(1.05);
+  }
+
+  button:active {
+      transform: scale(0.95);
+  }
+
+  .results {
       margin-top: 1.5rem;
-      font-size: 1.2rem;
-      color: #333;
-    }
-  
-    .result {
+      width: 100%;
+      max-width: 400px;
+  }
+
+  .result {
       font-weight: bold;
       color: #28a745;
-    }
-  </style>
+      margin-bottom: 0.5rem;
+      padding: 10px;
+      border: 1px solid #d4edda;
+      border-radius: 5px;
+      background-color: #d4edda;
+  }
+</style>
